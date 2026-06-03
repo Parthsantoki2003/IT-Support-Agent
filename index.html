@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise IT Support AI</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Inter', 'sans-serif'], 
+                        mono: ['Fira Code', 'monospace'] 
+                    },
+                    animation: {
+                        'message-slide-up': 'messageSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pulse-glow': 'pulseGlow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float-slow': 'float 20s ease-in-out infinite',
+                        'float-medium': 'float 15s ease-in-out infinite',
+                        'float-fast': 'float 10s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        messageSlideUp: {
+                            '0%': { opacity: '0', transform: 'translate3d(0, 30px, 0) scale(0.98)' },
+                            '100%': { opacity: '1', transform: 'translate3d(0, 0, 0) scale(1)' }
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { opacity: 1, filter: 'drop-shadow(0 0 10px rgba(16, 185, 129, 0.8))' },
+                            '50%': { opacity: .4, filter: 'drop-shadow(0 0 2px rgba(16, 185, 129, 0.2))' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+                            '33%': { transform: 'translateY(-20px) rotate(2deg)' },
+                            '66%': { transform: 'translateY(15px) rotate(-1deg)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #01030a; 
+            color: #E5E7EB; 
+            /* Subtle grid overlay for tech feel */
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        
+        /* Premium Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+        
+        /* Enterprise Vision Pro Glassmorphism */
+        .vision-glass {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid rgba(255,255,255,.08);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,.15), inset 0 -1px 1px rgba(0,0,0,.5), 0 25px 60px rgba(0,0,0,.55), 0 0 50px rgba(59,130,246,.05);
+        }
+
+        .vision-glass::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.5), transparent);
+        }
+
+        .vision-input-dock {
+            position: relative;
+            background: rgba(8, 10, 15, 0.85);
+            backdrop-filter: blur(30px) saturate(200%);
+            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .vision-input-dock::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255,255,255,.25), transparent, rgba(59,130,246,.15));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            pointer-events: none;
+        }
+
+        .vision-input-dock:focus-within {
+            border-color: rgba(96, 165, 250, 0.5);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 30px -5px rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Abstract Floating Glass Objects */
+        .crystal-sphere {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.25), rgba(255,255,255,.08) 40%, rgba(255,255,255,.01) 70%);
+            border: 1px solid rgba(255,255,255,.08);
+            backdrop-filter: blur(30px);
+            box-shadow: inset 0 2px 10px rgba(255,255,255,.15), 0 0 120px rgba(99,102,241,.08);
+            animation: crystalFloat 20s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        .crystal-sphere::before {
+            content: '';
+            position: absolute;
+            width: 40%;
+            height: 40%;
+            top: 15%;
+            left: 15%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,.4), transparent);
+            filter: blur(10px);
+        }
+
+        @keyframes crystalFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-30px); }
+        }
+
+        .holo-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(99,102,241,.15);
+            box-shadow: 0 0 40px rgba(99,102,241,.08);
+            animation: rotateRing 40s linear infinite;
+        }
+
+        @keyframes rotateRing {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .light-beam {
+            position: absolute;
+            width: 350px;
+            height: 1400px;
+            background: linear-gradient(to bottom, transparent, rgba(59,130,246,.05), transparent);
+            filter: blur(80px);
+            transform: rotate(25deg);
+            animation: beamMove 20s ease-in-out infinite;
+        }
+
+        @keyframes beamMove {
+            0%, 100% { transform: rotate(25deg) translateX(0); }
+            50% { transform: rotate(30deg) translateX(80px); }
+        }
+
+        /* Nuclear padding option to fix the scroll overlap */
+        #chatBox {
+            padding-bottom: 280px !important;
+        }
+        
+        /* Markdown Styling Engine */
+        .prose p { margin-bottom: 0.85em; line-height: 1.7; font-weight: 300; letter-spacing: 0.01em; color: #D1D5DB; }
+        .prose p:last-child { margin-bottom: 0; }
+        .prose strong { color: #FFFFFF; font-weight: 500; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
+        .prose pre { 
+            background: rgba(0, 0, 0, 0.5) !important; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 0.75rem; 
+            padding: 1.25rem; 
+            margin: 1.25rem 0; 
+            overflow-x: auto; 
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .prose pre::before {
+            content: ''; display: block; margin-bottom: 1rem;
+            width: 10px; height: 10px; border-radius: 50%;
+            background: #ef4444;
+            box-shadow: 16px 0 0 #eab308, 32px 0 0 #22c55e;
+            opacity: 0.7;
+        }
+        .prose code { 
+            font-family: 'Fira Code', monospace; 
+            font-size: 0.85em; 
+            background: rgba(59, 130, 246, 0.1); 
+            padding: 0.2rem 0.4rem; 
+            border-radius: 0.375rem; 
+            color: #93C5FD; 
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        .prose pre code { background: transparent; padding: 0; color: #E5E7EB; border: none; }
+        .prose ul { list-style-type: none; padding-left: 0.5em; margin-bottom: 1em; }
+        .prose li { position: relative; padding-left: 1.5em; margin-bottom: 0.5em; color: #D1D5DB; font-weight: 300; }
+        .prose li::before { content: '→'; position: absolute; left: 0; color: #60A5FA; font-weight: 400; opacity: 0.8; }
+    </style>
+</head>
+<body class="h-screen w-full flex flex-col antialiased overflow-hidden selection:bg-blue-500/30 selection:text-white">
+    
+    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div class="light-beam left-0 top-0"></div>
+        <div class="light-beam right-0 top-0"></div>
+        <div class="crystal-sphere w-[400px] h-[400px] top-[10%] right-[8%]"></div>
+        <div class="crystal-sphere w-[180px] h-[180px] bottom-[15%] left-[8%]"></div>
+        <div class="holo-ring w-[500px] h-[500px] top-[5%] right-[5%]"></div>
+        <div class="holo-ring w-[250px] h-[250px] bottom-[20%] left-[10%]"></div>
+        <div class="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-blue-600/10 rounded-full blur-[150px]"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-purple-600/10 rounded-full blur-[150px]"></div>
+    </div>
+
+    <div class="w-full h-full flex flex-col relative z-10 overflow-hidden">
+        
+        <header class="h-16 shrink-0 border-b border-white/5 flex items-center justify-between px-6 md:px-12 bg-black/20 backdrop-blur-3xl shadow-[0_10px_60px_rgba(0,0,0,.4)] z-30">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-[10px] bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-700 flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.4)] border border-white/20 relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                    <svg class="w-5 h-5 text-white relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <div class="flex flex-col justify-center">
+                    <h1 class="font-medium text-[16px] text-white tracking-wide">IT Support Assistant</h1>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-glow shadow-[0_0_8px_#34d399]"></div>
+                        <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.15em]">FastAPI Linked</p>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="p-2 rounded-full hover:bg-white/5 transition-colors text-slate-400 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" /></svg>
+            </button>
+        </header>
+
+        <div class="flex-1 overflow-y-auto w-full scroll-smooth z-10 relative">
+            <div id="chatBox" class="max-w-4xl mx-auto w-full p-4 md:p-8 pt-8 flex flex-col space-y-8">
+                
+                <div class="flex flex-col space-y-2 w-full items-start">
+                    <div class="vision-glass px-7 py-6 text-slate-200 text-[15px] leading-relaxed rounded-3xl rounded-tl-sm max-w-[95%] md:max-w-[85%]">
+                        Hello! I am your AI-enabled IT Support Assistant. Ask me any hardware, networking, or troubleshooting questions based on the Authorised Manual.
+                    </div>
+                    <span class="text-[10px] text-slate-500 font-mono px-3 uppercase tracking-wider opacity-70 flex items-center gap-1.5">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        System Prompt
+                    </span>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-[#01030a] via-[#01030a]/80 to-transparent pt-32 pb-8 px-4 md:px-8 z-30 pointer-events-none">
+            <div class="max-w-3xl mx-auto flex items-end vision-input-dock rounded-3xl p-2 pointer-events-auto relative overflow-hidden">
+                
+                <textarea 
+                    id="userInput" 
+                    rows="1"
+                    placeholder="Describe your technical issue..." 
+                    class="flex-1 max-h-40 bg-transparent border-none outline-none text-slate-100 placeholder-slate-500/70 text-[15px] py-4 pl-6 pr-4 resize-none font-light tracking-wide leading-relaxed"
+                    oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'"
+                    onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
+                ></textarea>
+                
+                <div class="p-2 shrink-0 flex items-end">
+                    <button 
+                        onclick="sendMessage()" 
+                        class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white p-3.5 rounded-2xl transition-all duration-300 flex items-center justify-center transform active:scale-90 shadow-[0_0_20px_rgba(79,70,229,0.4)] border border-white/10 group"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 translate-x-[1px] translate-y-[-1px] group-hover:translate-x-[3px] group-hover:-translate-y-[3px] transition-transform duration-300">
+                            <path d="M3.478 2.404a.75.75 0 00-.926.941l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.404z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="text-center mt-4 pointer-events-none">
+                <p class="text-[10px] text-slate-500 font-medium tracking-widest uppercase">Secure Enterprise Environment</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Premium Parallax Engine ---
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 100;
+            const y = (e.clientY / window.innerHeight - 0.5) * 100;
+            
+            document.querySelectorAll('.parallax-element').forEach(el => {
+                const speed = parseFloat(el.getAttribute('data-speed'));
+                el.style.transform = `translate3d(${x * speed}px, ${y * speed}px, 0)`;
+            });
+        });
+
+        // --- 2. Chat Logic ---
+        async function sendMessage() {
+            const inputField = document.getElementById('userInput');
+            const text = inputField.value.trim();
+            if (!text) return;
+
+            inputField.value = '';
+            inputField.style.height = 'auto';
+            const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            appendMessage(text, 'user', currentTime);
+
+            try {
+                const response = await fetch('https://it-chatbot-api-1045979193890.us-central1.run.app/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: "capstone-session", message: text })
+                });
+                
+                const data = await response.json();
+                const botTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                appendMessage(data.reply, 'bot', botTime);
+
+            } catch (error) {
+                console.error("Connection Error:", error);
+                appendMessage("Error: Could not connect to the FastAPI backend. Make sure the Cloud Run instance is active.", 'bot', currentTime);
+            }
+        }
+
+        function appendMessage(text, sender, time) {
+            const chatBox = document.getElementById('chatBox');
+            const chatContainer = chatBox.parentElement; 
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex flex-col space-y-2 w-full opacity-0 animate-message-slide-up ${
+                sender === 'user' ? 'items-end' : 'items-start'
+            }`;
+
+            const bubble = document.createElement('div');
+            
+            if (sender === 'user') {
+                bubble.className = `px-7 py-4 text-[15px] font-light tracking-wide max-w-[95%] md:max-w-[75%] bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 text-white rounded-[2rem] rounded-tr-sm border border-white/10 shadow-[0_15px_50px_rgba(99,102,241,.45)] backdrop-blur-xl`;
+                bubble.innerText = text;
+            } else {
+                bubble.className = `px-7 py-6 text-[15px] max-w-[95%] md:max-w-[85%] vision-glass text-slate-200 rounded-[2.5rem] rounded-tl-sm prose prose-invert prose-p:font-light`;
+                bubble.innerHTML = marked.parse(text);
+            }
+
+            const subMeta = document.createElement('div');
+            subMeta.className = `flex items-center gap-4 px-3 ${
+                sender === 'user' ? 'flex-row-reverse' : 'flex-row'
+            }`;
+
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'text-[10px] font-mono text-slate-500 opacity-70 tracking-wider';
+            timeSpan.innerText = time;
+            subMeta.appendChild(timeSpan);
+
+            if (sender === 'bot') {
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'text-slate-500 hover:text-white transition-all duration-300 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] px-3 py-1.5 rounded-lg hover:bg-white/5 pointer-events-auto border border-transparent hover:border-white/10';
+                copyBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5 opacity-80">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0A2.25 2.25 0 0113.5 4.5h-3a2.25 2.25 0 01-2.166-1.5m7.332 0c.055.194.084.4.084.612v1.512c0 .732-.367 1.378-.934 1.762m-9.354 0c-.567-.384-.934-1.03-.934-1.762V3c0-.212.029-.418.084-.612m7.332 0c.546.045 1.09.114 1.632.206m-9.314.207a51.108 51.108 0 000 3.992M14 17.25c0 .345-.029.686-.085 1.018a10.97 10.97 0 01-6.848-6.848c.332-.056.673-.085 1.018-.085h6.25zm5.18 4.08a6.028 6.028 0 001.68-3.997V13.5h-3.75v3.75h3.75z" />
+                    </svg> Copy`;
+                
+                copyBtn.onclick = () => {
+                    navigator.clipboard.writeText(text);
+                    const originalHtml = copyBtn.innerHTML;
+                    copyBtn.innerHTML = `<span class="text-emerald-400 flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> Copied</span>`;
+                    copyBtn.classList.add('bg-emerald-500/10', 'border-emerald-500/20');
+                    setTimeout(() => { 
+                        copyBtn.innerHTML = originalHtml; 
+                        copyBtn.classList.remove('bg-emerald-500/10', 'border-emerald-500/20');
+                    }, 2000);
+                };
+                subMeta.appendChild(copyBtn);
+            }
+
+            wrapper.appendChild(bubble);
+            wrapper.appendChild(subMeta);
+            chatBox.appendChild(wrapper);
+
+            // Using 300ms delay to guarantee slide-up animation and rendering completes before scrolling
+            setTimeout(() => {
+                chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+            }, 300);
+        }
+
+        // --- 3. Ambient Particle System ---
+        for(let i=0; i<25; i++) {
+            const p = document.createElement('div');
+            p.style.position = 'fixed';
+            p.style.width = '2px';
+            p.style.height = '2px';
+            p.style.borderRadius = '50%';
+            p.style.background = 'rgba(255,255,255,.15)';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.top = Math.random() * 100 + 'vh';
+            p.style.pointerEvents = 'none';
+            p.style.zIndex = '0';
+
+            p.animate(
+                [
+                    {transform: 'translateY(0px)'},
+                    {transform: 'translateY(-60px)'}
+                ],
+                {
+                    duration: 10000 + Math.random() * 10000,
+                    iterations: Infinity
+                }
+            );
+            document.body.appendChild(p);
+        }
+    </script>
+</body>
+</html>
