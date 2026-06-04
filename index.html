@@ -132,6 +132,8 @@
             margin: 1rem 0; 
             overflow-x: auto; 
         }
+.prose { max-width: 100%; min-width: 0; }
+
         .prose code { 
             font-family: 'Fira Code', monospace; 
             font-size: 0.85em; 
@@ -331,13 +333,13 @@
             const bubble = document.createElement('div');
             
          if (sender === 'user') {
-                // Added w-fit, overflow-wrap, and balanced mobile padding
-                bubble.className = `px-4 py-2.5 md:px-5 md:py-3 text-[14px] md:text-[15px] font-sans font-light tracking-wide bg-sky-900/40 text-sky-100 rounded-xl rounded-tr-sm border border-sky-500/30 shadow-[0_5px_15px_rgba(0,0,0,0.3)] w-fit max-w-[92%] md:max-w-[75%] break-words [overflow-wrap:anywhere]`;
+                bubble.className = `px-4 py-2.5 md:px-5 md:py-3 text-[14px] md:text-[15px] font-sans font-light tracking-wide bg-sky-900/40 text-sky-100 rounded-xl rounded-tr-sm border border-sky-500/30 shadow-[0_5px_15px_rgba(0,0,0,0.3)] w-fit max-w-[90%] md:max-w-[75%] break-words min-w-0`;
                 bubble.innerText = text;
 
             } else {
-                // Added w-fit, overflow-wrap, and max-w-none to prevent prose width bugs
-                bubble.className = `p-4 md:p-6 text-[14px] md:text-[15px] w-fit max-w-[92%] md:max-w-[85%] vision-glass text-slate-200 rounded-2xl rounded-tl-sm prose prose-invert max-w-none break-words [overflow-wrap:anywhere] overflow-x-auto`;
+                // REMOVED 'max-w-none' which was breaking the mobile view
+                // ADDED 'min-w-0' to force flexbox to respect the max-w bounds
+                bubble.className = `p-4 md:p-6 text-[14px] md:text-[15px] w-fit max-w-[90%] md:max-w-[85%] vision-glass text-slate-200 rounded-2xl rounded-tl-sm prose prose-invert break-words min-w-0`;
                 bubble.innerHTML = marked.parse(text);
             }
 
