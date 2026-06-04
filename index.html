@@ -111,8 +111,8 @@
             z-index: 0;
         }
 
-        /* Mandatory spacing for floating dock */
-        #chatBox { padding-bottom: 250px !important; }
+        /* Mandatory spacing for floating dock - use safe-area for tall/mobile screens */
+        #chatBox { padding-bottom: calc(6rem + env(safe-area-inset-bottom, 24px)) !important; }
         
         /* Terminal Markdown Styling */
        .prose p { 
@@ -147,6 +147,15 @@
         .prose ul { list-style-type: none; padding-left: 0.5em; }
         .prose li { position: relative; padding-left: 1.5em; margin-bottom: 0.5em; }
         .prose li::before { content: '>'; position: absolute; left: 0; color: #38BDF8; font-family: 'Fira Code', monospace; font-weight: bold; }
+    </style>
+    <style>
+        /* Small-screen adjustments for fixed dock */
+        @media (max-width: 480px) {
+            #bottomDock { padding-left: 12px; padding-right: 12px; }
+            .vision-input-dock { padding: 0.5rem; }
+            .fixed-dock-btn { padding: 0.75rem !important; border-radius: 0.75rem; }
+            #chatBox { padding-bottom: calc(8rem + env(safe-area-inset-bottom, 24px)) !important; }
+        }
     </style>
 </head>
 <body class="h-screen w-full flex flex-col antialiased overflow-hidden selection:bg-cyan-500/30 selection:text-white">
@@ -195,8 +204,8 @@
             </div>
         </div>
 
-        <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-[#020617] via-[#020617]/90 to-transparent pt-24 pb-6 px-4 md:px-8 z-30 pointer-events-none">
-            <div class="max-w-3xl mx-auto flex items-end vision-input-dock rounded-xl p-1.5 pointer-events-auto">
+        <div id="bottomDock" class="fixed bottom-0 left-0 w-full bg-gradient-to-t from-[#020617] via-[#020617]/90 to-transparent pt-20 pb-4 px-3 md:px-8 z-50 pointer-events-none" style="padding-bottom: env(safe-area-inset-bottom, 12px); will-change: transform;">
+            <div id="dockInner" class="max-w-3xl mx-auto flex items-end vision-input-dock rounded-xl p-2 pointer-events-auto z-50">
                 
                 <textarea 
     id="userInput" 
@@ -207,10 +216,11 @@
     onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
 ></textarea>
                 
-                <div class="p-1.5 shrink-0 flex items-end">
+                    <div class="p-1.5 shrink-0 flex items-end">
                     <button 
                         onclick="sendMessage()" 
-                        class="bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 p-3 rounded-lg transition-all duration-200 flex items-center justify-center border border-sky-500/30 hover:border-sky-400 active:scale-95"
+                        class="bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 p-3 md:p-4 rounded-lg transition-all duration-200 flex items-center justify-center border border-sky-500/30 hover:border-sky-400 active:scale-95 relative z-50 fixed-dock-btn"
+                        aria-label="Send message"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
                             <path d="M3.478 2.404a.75.75 0 00-.926.941l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.404z" />
@@ -222,6 +232,54 @@
     </div>
 
     <script>
+        // --- 3. Mobile keyboard / viewport docking adjustments ---
+        (function(){
+            const bottomDock = document.getElementById('bottomDock');
+            const dockInner = document.getElementById('dockInner');
+            const chatBox = document.getElementById('chatBox');
+
+            function updateDockForViewport(){
+                try{
+                    const visual = window.visualViewport;
+                    let offset = 0;
+
+                    if(visual){
+                        // amount the visual viewport is smaller than layout viewport (keyboard visible)
+                        offset = Math.max(0, window.innerHeight - visual.height - (visual.offsetTop || 0));
+                    } else {
+                        // fallback: use difference between documentElement clientHeight and innerHeight
+                        offset = Math.max(0, document.documentElement.clientHeight - window.innerHeight);
+                    }
+
+                    // push dock up by offset px
+                    if(bottomDock){
+                        bottomDock.style.transform = offset ? `translateY(-${offset}px)` : '';
+                    }
+
+                    // ensure chatBox has enough bottom padding so messages aren't hidden
+                    if(chatBox){
+                        chatBox.style.paddingBottom = `calc(6rem + ${offset}px + env(safe-area-inset-bottom, 24px))`;
+                    }
+                }catch(e){ console.warn('dock update error', e); }
+            }
+
+            if(window.visualViewport){
+                window.visualViewport.addEventListener('resize', updateDockForViewport);
+                window.visualViewport.addEventListener('scroll', updateDockForViewport);
+            }
+            window.addEventListener('resize', updateDockForViewport);
+            window.addEventListener('orientationchange', updateDockForViewport);
+
+            // update when textarea focus/blur occur
+            const input = document.getElementById('userInput');
+            if(input){
+                input.addEventListener('focus', () => setTimeout(updateDockForViewport, 50));
+                input.addEventListener('blur', () => setTimeout(updateDockForViewport, 50));
+            }
+
+            // initial call
+            setTimeout(updateDockForViewport, 250);
+        })();
         // --- 1. IT Network Topology Canvas Engine ---
         const canvas = document.getElementById('networkCanvas');
         const ctx = canvas.getContext('2d');
